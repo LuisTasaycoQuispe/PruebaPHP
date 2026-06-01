@@ -284,7 +284,6 @@ try {
     $mailCliente->Subject = "Confirmación de tu registro — " . ($referencia ?: $nombreContacto);
     $mailCliente->isHTML(true);
     $mailCliente->Body = $htmlCliente;
-    $mailCliente->addStringAttachment($pdfBuffer, $filename, 'base64', 'application/pdf');
     
     $mailCliente->addCustomHeader('X-Priority', '3');
     $mailCliente->addCustomHeader('X-Mailer', 'PHPMailer');
