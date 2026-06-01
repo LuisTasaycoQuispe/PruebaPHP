@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config/mailers.php';
 
@@ -77,14 +78,11 @@ try {
     <head>
         <style>
             body { font-family: 'Helvetica', sans-serif; margin: 20px; color: #2c2c2c; }
-                
-            .header-table { width: 100%;padding-bottom: 10px; margin-bottom: 20px; }
+            .header-table { width: 100%; padding-bottom: 10px; margin-bottom: 20px; }
             .header-logo { text-align: right; }
-        
             .title { color: #2a4e33; font-size: 30px; font-weight: bold; }
-            .section-title--feature{ background: #ffffff; color: #1a1a1a; padding: 5px 10px; border-left:5px solid #93a89c; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
-            .section-title { background: #93a89c; color: #1a1a1a; padding: 5px 10px; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
-            .sombra{background-color: #faf7f7;}
+            .section-title--feature { background: #ffffff; color: #1a1a1a; padding: 5px 10px; border-left: 5px solid #93a89c; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
+            .sombra { background-color: #faf7f7; }
             table { width: 100%; border-collapse: collapse; margin-top: 8px; }
             th { background: #9dc5ae; color: #1a1a1a; text-align: left; padding: 6px; font-size: 11px; }
             td { padding: 7px; border-bottom: 1px solid #e8e8e8; font-size: 12px; }
@@ -94,7 +92,7 @@ try {
         </style>
     </head>
     <body>
-             <table class='header-table'>
+        <table class='header-table'>
             <tr>
                 <td style='border: none; padding: 0; vertical-align: middle;'>
                     <span class='title'>Registro de Cliente</span>
@@ -138,7 +136,7 @@ try {
         <div class='section-title--feature'>Validación</div>
         <table>
             <tr><td class='label'>Acepta traer varias copias de sus pasaportes</td><td class='value'>{$datosAEnviar['aceptaCheck']}</td></tr>
-            <tr  class='sombra'><td class='label'>Pasaportes vigentes durante el viaje</td><td class='value'>{$datosAEnviar['copiaPasaporte']}</td></tr>
+            <tr class='sombra'><td class='label'>Pasaportes vigentes durante el viaje</td><td class='value'>{$datosAEnviar['copiaPasaporte']}</td></tr>
         </table>
         
         <div class='footer'>© {$anioActual} Fiesta Tours Peru — Documento generado automáticamente</div>
@@ -155,6 +153,7 @@ try {
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datosAEnviar));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); 
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
     $sheetResponse = curl_exec($ch);
     $sheetResult = json_decode($sheetResponse, true);
     curl_close($ch);
@@ -214,7 +213,6 @@ try {
     
     $htmlEjecutivo = emailBase('Nuevo Registro de Cliente', "Referencia: " . ($datosAEnviar['referencia'] ?: '—'), $cuerpoEjecutivo);
 
-    // Email Cliente HTML
     $filasHab = '';
     foreach ([['Doble (dos camas)', $datosAEnviar['doble_dos_camas']], ['Doble matrimonial', $datosAEnviar['dobleMatrimonial']], ['Suite familiar', $datosAEnviar['suiteFamiliar']], ['Individual', $datosAEnviar['individual']]] as $h) {
         $filasHab .= emailFila($h[0], $h[1]);
@@ -223,20 +221,20 @@ try {
 
     $filasPax = '';
     foreach ($datosAEnviar['pasajeros'] as $i => $p) {
-        $idx = $i + 1;
         $fullname = implode(' ', array_filter([$p['titulo'] ?? '', $p['nombre'] ?? '', $p['apellido'] ?? '']));
         $paxDetails = !empty($p['pasaporte']) ? "<br/><span style='color:#888;font-size:12px;'>Pasaporte: {$p['pasaporte']}</span>" : "";
         $paxDetails .= !empty($p['nacionalidad']) ? "<span style='color:#888;font-size:12px;'> · {$p['nacionalidad']}</span>" : "";
         
         $filasPax .= "
         <tr><td style='padding:10px 0;border-bottom:1px solid #f0f0f0;'>
-            <span style='color:#D9B244;font-size:10px;letter-spacing:2px;text-transform:uppercase;'>Pasajero {$idx}</span><br/>
+            <span style='color:#D9B244;font-size:10px;letter-spacing:2px;text-transform:uppercase;'>Pasajero ".($i + 1)."</span><br/>
             <span style='color:#1a1a1a;font-size:14px;'><b>{$fullname}</b></span>{$paxDetails}
         </td></tr>";
     }
     if(empty($filasPax)) $filasPax = "<tr><td style='padding:9px 0;color:#888;font-size:13px;'>Sin pasajeros registrados</td></tr>";
 
     $cuerpoCliente = "
+    <p style='font-weight:900;'>❗️ No Responder a Este Correo</p>
     <p style='margin:0 0 6px;color:#1a1a1a;font-size:16px;'>Estimado/a <b>{$datosAEnviar['nombreContacto']}</b>,</p>
     <p style='margin:0 0 28px;color:#555;font-size:14px;'>Hemos recibido tu registro correctamente. A continuación encontrarás un resumen. El documento completo está adjunto en PDF.</p>
     
@@ -262,26 +260,36 @@ try {
 
     $htmlCliente = emailBase('Confirmación de Registro', "Folio: " . ($datosAEnviar['referencia'] ?: $datosAEnviar['nombreContacto']), $cuerpoCliente);
 
-    // ---- DESPACHO DE ENVIOS POR SMTP (PHPMailer) ----
     $cleanedName = preg_replace('/\s+/', '_', $nombreContacto);
     $filename = "registro_{$cleanedName}.pdf";
 
     $mailEjecutivo = getTransporter(); 
-    $mailEjecutivo->setFrom(USER_1, 'Fiesta Tours Peru');
+    $mailEjecutivo->setFrom(USER_1, 'FTI Registro Cliente - WEB');
     $mailEjecutivo->addAddress($correoDestino);
+    $mailEjecutivo->addReplyTo($emailContacto, $nombreContacto); 
     $mailEjecutivo->Subject = "Nuevo Registro — {$nombreContacto}";
     $mailEjecutivo->isHTML(true);
     $mailEjecutivo->Body = $htmlEjecutivo;
     $mailEjecutivo->addStringAttachment($pdfBuffer, $filename, 'base64', 'application/pdf'); 
+    
+    $mailEjecutivo->addCustomHeader('X-Priority', '3');
+    $mailEjecutivo->addCustomHeader('X-Mailer', 'PHPMailer');
+    $mailEjecutivo->addCustomHeader('Precedence', 'bulk');
+    $mailEjecutivo->addCustomHeader('X-Auto-Response-Suppress', 'OOF, AutoReply');
     $mailEjecutivo->send();
 
     $mailCliente = getTransporter();
-    $mailCliente->setFrom(USER_1, 'Fiesta Tours Peru');
+    $mailCliente->setFrom(USER_1, 'Notificaciones Fiesta Tours Peru - WEB');
     $mailCliente->addAddress($emailContacto);
     $mailCliente->Subject = "Confirmación de tu registro — " . ($referencia ?: $nombreContacto);
     $mailCliente->isHTML(true);
     $mailCliente->Body = $htmlCliente;
     $mailCliente->addStringAttachment($pdfBuffer, $filename, 'base64', 'application/pdf');
+    
+    $mailCliente->addCustomHeader('X-Priority', '3');
+    $mailCliente->addCustomHeader('X-Mailer', 'PHPMailer');
+    $mailCliente->addCustomHeader('Precedence', 'bulk');
+    $mailCliente->addCustomHeader('X-Auto-Response-Suppress', 'OOF, AutoReply');
     $mailCliente->send();
 
     echo json_encode([
