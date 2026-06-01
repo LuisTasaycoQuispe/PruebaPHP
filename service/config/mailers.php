@@ -1,7 +1,4 @@
 <?php
-// api/config/mailers.php
-
-// Definimos las constantes globales de credenciales
 define('USER_1', 'luistasayco3030@gmail.com');
 define('PASS_1', 'xkii szmn wopp rqdr');
 

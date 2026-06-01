@@ -23,7 +23,7 @@ if (!$input) {
 
 $nombreContacto = $input['nombreContacto'] ?? '';
 $emailContacto  = $input['emailContacto'] ?? '';
-$correoDestino  = $input['correoDestino'] ?? ''; // ejecutivo
+$correoDestino  = $input['correoDestino'] ?? '';
 $referencia     = $input['referencia'] ?? '';
 
 if (empty(trim($nombreContacto)) || empty(trim($emailContacto))) {
