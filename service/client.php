@@ -50,10 +50,9 @@ $datosAEnviar = [
 ];
 
 try {
-    // ---- TODAS LAS CONFIGURACIONES DE DOMPDF UNIFICADAS AQUÍ ----
     $options = new Options();
-    $options->set('isRemoteEnabled', true);        // <--- Crucial para Cloudinary
-    $options->set('isHtml5ParserEnabled', true);   // <--- Mantiene el parser HTML5 activo
+    $options->set('isRemoteEnabled', true);        
+    $options->set('isHtml5ParserEnabled', true);  
     $options->set('defaultFont', 'Arial');
     
     $dompdf = new Dompdf($options);
@@ -77,13 +76,13 @@ try {
     <html>
     <head>
         <style>
-            body { font-family: 'Helvetica', sans-serif; margin: 40px; color: #2c2c2c; }
+            body { font-family: 'Helvetica', sans-serif; margin: 20px; color: #2c2c2c; }
                 
             .header-table { width: 100%;padding-bottom: 10px; margin-bottom: 20px; }
             .header-logo { text-align: right; }
         
-            .title { color: #2a4e33; font-size: 22px; font-weight: bold; }
-            .section-title--feature{ background: #ffffff; color: #1a1a1a; padding: 5px 10px; border-left:5px solid green; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
+            .title { color: #2a4e33; font-size: 30px; font-weight: bold; }
+            .section-title--feature{ background: #ffffff; color: #1a1a1a; padding: 5px 10px; border-left:5px solid #93a89c; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
             .section-title { background: #93a89c; color: #1a1a1a; padding: 5px 10px; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
             .sombra{background-color: #faf7f7;}
             table { width: 100%; border-collapse: collapse; margin-top: 8px; }
@@ -101,7 +100,7 @@ try {
                     <span class='title'>Registro de Cliente</span>
                 </td>
                 <td class='header-logo' style='border: none; padding: 0; vertical-align: middle;'>
-                    <img style='width: 240px; height: auto;' src='https://res.cloudinary.com/dlgeap8h0/image/upload/f_auto,q_auto/v1776726875/Group_22_vtvrk3.png' alt='logo'/>
+                    <img style='width: 300px; height: auto;' src='https://res.cloudinary.com/dlgeap8h0/image/upload/f_auto,q_auto/v1776726875/Group_22_vtvrk3.png' alt='logo'/>
                 </td>
             </tr>
         </table>
@@ -199,7 +198,6 @@ try {
         }
     }
 
-    // Email Ejecutivo HTML
     $cuerpoEjecutivo = "
     <p style='margin:0 0 20px;color:#555;font-size:15px;line-height:1.7;'>Un nuevo cliente ha completado su registro. El detalle completo está adjunto en PDF.</p>
     <table width='100%' cellpadding='0' cellspacing='0' style='background:#f9f9f9;border-left:4px solid #645939;border-radius:4px;margin-bottom:24px;'>
