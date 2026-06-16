@@ -27,7 +27,7 @@ if (!$input) {
 
 $nombreContacto = trim($input['nombre'] ?? '');
 $emailContacto  = trim($input['email'] ?? '');
-$correoDestino  = 'dw@fiestatoursperu.com, dw1@fiestatoursperu.com';
+$correoDestino  = 'luistasayco3030@gmail.com, dw@fiestatoursperu.com';
 $referencia     = $input['referencia'] ?? '';
 
 if (empty($nombreContacto) || empty($emailContacto)) {
@@ -67,93 +67,88 @@ function buildSections(array $datos, bool $esPDF = true): string
 {
     $html = '';
 
-    $sectionClass  = $esPDF ? "section-title"    : "title-subtitle_feature";
-    $tableClass    = $esPDF ? "data-table"        : "data-table";
-    $commentClass  = $esPDF ? "comment-box"       : "container-comentarios";
-    $commentInner  = $esPDF ? ""                  : "<p>%s</p>";
+    $sectionClass = $esPDF ? "section-title" : "title-subtitle_feature";
+    $tableClass   = "data-table";
+    $commentClass = $esPDF ? "comment-box" : "container-comentarios";
 
-    $renderComment = function(string $texto, string $label) use ($commentClass, $commentInner, $esPDF): string {
-        if ($texto === '-') return '';
-        $contenido = $esPDF
-            ? "{$label}: {$texto}"
-            : sprintf("<p>{$label}: {$texto}</p>");
-        return "<div class='{$commentClass}'>{$contenido}</div>";
+    $renderComment = function(string $texto, string $label) use ($commentClass, $esPDF): string {
+        if ($texto === '-' || trim($texto) === '') return '';
+        if ($esPDF) {
+            return "<div class='{$commentClass}'><strong>{$label}:</strong> {$texto}</div>";
+        } else {
+            return "
+            <div style='margin-top:18px; margin-bottom:50px;border-left: 4px solid #7f8d88;'>
+                <div style='margin-left:10px; color: #3e5e4a; text-transform:uppercase; padding:6px 10px; font-size:14px; font-weight:bold;'>
+                    {$label}
+                </div>
+                <div style='margin-top:10px; margin-left:10px;  border-top:none; padding:10px; font-size:12px; color:#444444;'>
+                    {$texto}
+                </div>
+            </div>";
+        }
     };
 
     if (!empty($datos['hotelTransfer'])) {
-        $html .= "<div style='color: #2a4e33; margin-top:20px; font-weight:800' class='{$sectionClass} section-tittle_feature'>Hotel Transfer</div>";
+        $html .= "<div class='{$sectionClass}' style='font-family: Arial, sans-serif; text-transform:uppercase;color:#2a4e33;margin-top:20px;font-weight:800'>Hotel Transfer</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['hotelTransfer'] as $ht) {
             $nombre = esc((string)($ht['hotelTransfer_name'] ?? ''));
             $calif  = esc((string)($ht['hotelTransfer_calificacion'] ?? ''));
-            $html .= "<tr>
-                <td class='val-name'>{$nombre}</td>
-                <td class='val-rating'>{$calif}</td>
-            </tr>";
+            $html .= "<tr><td class='val-name'>{$nombre}</td><td class='val-rating'>{$calif}</td></tr>";
         }
         $html .= "</table>";
         $html .= $renderComment($datos['comentarioHotelTransfer'], 'Comentario Hotel Transfer');
     }
 
     if (!empty($datos['tours'])) {
-        $html .= "<div style='color: #2a4e33; margin-top:20px; font-weight:800' class='{$sectionClass}  section-tittle_feature'>Tours y Guías</div>";
+        $html .= "<div class='{$sectionClass}' style='font-family: Arial, sans-serif; text-transform:uppercase;color:#2a4e33;margin-top:20px;font-weight:800'>Tours y Guías</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['tours'] as $t) {
             $nombre = esc((string)($t['tours_name'] ?? ''));
             $calif  = esc((string)($t['tours_calificacion'] ?? ''));
-            $html .= "<tr>
-                <td class='val-name'>{$nombre}</td>
-                <td class='val-rating'>{$calif}</td>
-            </tr>";
+            $html .= "<tr><td class='val-name'>{$nombre}</td><td class='val-rating'>{$calif}</td></tr>";
         }
         $html .= "</table>";
-        $html .= $renderComment($datos['comentariosToursGuia'], "<div class='container-comentario'><span style='color: #2a4e33; margin-top:20px; font-weight:800'>Comentario Tours y Guías</span></div>");
+        $html .= $renderComment($datos['comentariosToursGuia'], 'Comentario Tours y Guías');
     }
 
     if (!empty($datos['hotel'])) {
-        $html .= "<div class='{$sectionClass}'  style='color: #2a4e33; margin-top:20px; font-weight:800'>Hoteles</div>";
+        $html .= "<div class='{$sectionClass}' style='font-family: Arial, sans-serif; text-transform:uppercase;color:#2a4e33;margin-top:20px;font-weight:800'>Hoteles</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['hotel'] as $h) {
             $nombre = esc((string)($h['hotel_name'] ?? ''));
             $ubi    = !empty($h['hotel_ubicacion']) ? '(' . esc((string)$h['hotel_ubicacion']) . ')' : '';
             $calif  = esc((string)($h['hotel_calificacion'] ?? ''));
-            $html .= "<tr>
-                <td class='val-name'>{$nombre} {$ubi}</td>
-                <td class='val-rating'>{$calif}</td>
-            </tr>";
+            $html .= "<tr><td class='val-name'>{$nombre} {$ubi}</td><td class='val-rating'>{$calif}</td></tr>";
         }
         $html .= "</table>";
         $html .= $renderComment($datos['comentarioHotel'], 'Comentario Hotel');
     }
 
     if (!empty($datos['restaurantes'])) {
-        $html .= "<div class='{$sectionClass}  section-tittle_feature'  style='color: #2a4e33; margin-top:20px; font-weight:800' >Restaurantes</div>";
+        $html .= "<div class='{$sectionClass}' style='font-family: Arial, sans-serif; text-transform:uppercase;color:#2a4e33;margin-top:20px;font-weight:800'>Restaurantes</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['restaurantes'] as $r) {
             $nombre = esc((string)($r['restaurante_name'] ?? ''));
             $ubi    = !empty($r['restaurante_ubicacion']) ? '(' . esc((string)$r['restaurante_ubicacion']) . ')' : '';
             $calif  = esc((string)($r['restaurante_calificacion'] ?? ''));
-            $html .= "<tr>
-                <td class='val-name'>{$nombre} {$ubi}</td>
-                <td class='val-rating'>{$calif}</td>
-            </tr>";
+            $html .= "<tr><td class='val-name'>{$nombre} {$ubi}</td><td class='val-rating'>{$calif}</td></tr>";
         }
         $html .= "</table>";
         $html .= $renderComment($datos['comentarioRestaurante'], 'Comentario Restaurante');
     }
 
-    if ($datos['comentario'] !== '-') {
-        $html .= "<div class='{$sectionClass}  section-tittle_feature' style='color: #2a4e33; margin-top:20px; font-weight:800'>Comentario General</div>";
+    if ($datos['comentario'] !== '-' && trim($datos['comentario']) !== '') {
+        $html .= "<div class='{$sectionClass}' style='font-family: Arial, sans-serif; text-transform:uppercase;color:#2a4e33;margin-top:20px;font-weight:800'>Comentario General</div>";
         if ($esPDF) {
-            $html .= "<div class='{$commentClass}'>{$datos['comentario']}</div>";
+            $html .= "<div class='comment-box'>{$datos['comentario']}</div>";
         } else {
-            $html .= "<div class='{$commentClass}'><p>{$datos['comentario']}</p></div>";
+            $html .= "<div class='container-comentarios'><p>{$datos['comentario']}</p></div>";
         }
     }
 
     return $html;
 }
-
 try {
     $options = new Options();
     $options->set('isRemoteEnabled', true);
@@ -176,12 +171,12 @@ try {
             .info-label { color: #2a4e33; font-weight: bold; width: 80px; }
 
             . section-tittle_feature{color: #2a4e33; font-weight:800; border-left: 10px solid red}
-            .section-title { background: #ffffff; color: #2a4e33; padding: 5px 0; border-left: 4px solid #2a4e33; padding-left: 10px; font-size: 14px; font-weight: bold; margin-top: 25px; margin-bottom: 8px; }
+            .section-title {font-family: Arial, sans-serif; background: #ffffff; color: #2a4e33; padding: 5px 0; border-left: 4px solid #2a4e33; padding-left: 10px; font-size: 14px; font-weight: bold; margin-top: 25px; margin-bottom: 8px; }
             table.data-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
             table.data-table td { padding: 8px 5px; border-bottom: 1px solid #e8e8e8; font-size: 13px; }
             table.data-table td.val-name { text-align: left; color: #333; text-transform: lowercase; }
             table.data-table td.val-rating { text-align: right; font-weight: bold; color: #000; }
-            .comment-box { background-color: #faf7f7; padding: 10px; border-left: 3px solid #617068; font-size: 12px; color: #555; margin-top: 8px; font-style: italic; }
+            .comment-box { background-color: #faf7f7; padding: 10px; font-size: 12px; color: #555; margin-top: 8px; }
             .footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 9px; color: #555555; }
         </style>
     </head>
