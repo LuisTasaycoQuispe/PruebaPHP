@@ -12,6 +12,8 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
 
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
@@ -25,7 +27,7 @@ if (!$input) {
 
 $nombreContacto = trim($input['nombre'] ?? '');
 $emailContacto  = trim($input['email'] ?? '');
-$correoDestino  = "dw@fiestatoursperu.com";
+$correoDestino  = 'dw@fiestatoursperu.com, dw1@fiestatoursperu.com';
 $referencia     = $input['referencia'] ?? '';
 
 if (empty($nombreContacto) || empty($emailContacto)) {
@@ -79,7 +81,7 @@ function buildSections(array $datos, bool $esPDF = true): string
     };
 
     if (!empty($datos['hotelTransfer'])) {
-        $html .= "<div class='{$sectionClass} section-tittle_feature'>Hotel Transfer</div>";
+        $html .= "<div style='color: #2a4e33; margin-top:20px; font-weight:800' class='{$sectionClass} section-tittle_feature'>Hotel Transfer</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['hotelTransfer'] as $ht) {
             $nombre = esc((string)($ht['hotelTransfer_name'] ?? ''));
@@ -94,7 +96,7 @@ function buildSections(array $datos, bool $esPDF = true): string
     }
 
     if (!empty($datos['tours'])) {
-        $html .= "<div class='{$sectionClass}  section-tittle_feature'>Tours y Guías</div>";
+        $html .= "<div style='color: #2a4e33; margin-top:20px; font-weight:800' class='{$sectionClass}  section-tittle_feature'>Tours y Guías</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['tours'] as $t) {
             $nombre = esc((string)($t['tours_name'] ?? ''));
@@ -105,11 +107,11 @@ function buildSections(array $datos, bool $esPDF = true): string
             </tr>";
         }
         $html .= "</table>";
-        $html .= $renderComment($datos['comentariosToursGuia'], 'Comentario Tours y Guías');
+        $html .= $renderComment($datos['comentariosToursGuia'], "<div class='container-comentario'><span style='color: #2a4e33; margin-top:20px; font-weight:800'>Comentario Tours y Guías</span></div>");
     }
 
     if (!empty($datos['hotel'])) {
-        $html .= "<div class='{$sectionClass} style='color: #2a4e33; font-weight:900;'>Hoteles</div>";
+        $html .= "<div class='{$sectionClass}'  style='color: #2a4e33; margin-top:20px; font-weight:800'>Hoteles</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['hotel'] as $h) {
             $nombre = esc((string)($h['hotel_name'] ?? ''));
@@ -125,7 +127,7 @@ function buildSections(array $datos, bool $esPDF = true): string
     }
 
     if (!empty($datos['restaurantes'])) {
-        $html .= "<div class='{$sectionClass}  section-tittle_feature'>Restaurantes</div>";
+        $html .= "<div class='{$sectionClass}  section-tittle_feature'  style='color: #2a4e33; margin-top:20px; font-weight:800' >Restaurantes</div>";
         $html .= "<table class='{$tableClass}'>";
         foreach ($datos['restaurantes'] as $r) {
             $nombre = esc((string)($r['restaurante_name'] ?? ''));
@@ -141,7 +143,7 @@ function buildSections(array $datos, bool $esPDF = true): string
     }
 
     if ($datos['comentario'] !== '-') {
-        $html .= "<div class='{$sectionClass}  section-tittle_feature'>Comentario General</div>";
+        $html .= "<div class='{$sectionClass}  section-tittle_feature' style='color: #2a4e33; margin-top:20px; font-weight:800'>Comentario General</div>";
         if ($esPDF) {
             $html .= "<div class='{$commentClass}'>{$datos['comentario']}</div>";
         } else {
@@ -252,7 +254,6 @@ try {
     <tr><td align=\"center\">
     <table class=\"container\" cellpadding=\"0\" cellspacing=\"0\">
 
-        <!-- Cabecera -->
         <tr><td class=\"header\">
             <span>Resumen de Evaluaci&oacute;n</span>
         </td></tr>
@@ -273,7 +274,6 @@ try {
 
         </td></tr>
 
-        <!-- Pie -->
         <tr><td class=\"footer-row\">
             Fiesta Tours Per&uacute; &copy; {$anioActual} &mdash; Todos los derechos reservados.
         </td></tr>
@@ -288,7 +288,10 @@ try {
 
     $mailEjecutivo = getTransporter();
     $mailEjecutivo->setFrom(USER_1, 'Fiesta Tours Peru - Evaluaciones');
-    $mailEjecutivo->addAddress($correoDestino);
+    $correos = explode(',', $correoDestino);
+    foreach ($correos as $correo) {
+        $mailEjecutivo->addAddress(trim($correo));
+    }
     $mailEjecutivo->addReplyTo($emailContacto, $nombreContacto);
     $mailEjecutivo->Subject = "Nuevo Registro - {$nombreContacto}";
     $mailEjecutivo->isHTML(true);
