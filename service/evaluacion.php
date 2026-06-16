@@ -27,7 +27,7 @@ if (!$input) {
 
 $nombreContacto = trim($input['nombre'] ?? '');
 $emailContacto  = trim($input['email'] ?? '');
-$correoDestino  = 'luistasayco3030@gmail.com, dw@fiestatoursperu.com';
+$correoDestino  = 'luistasayco3030@gmail.com, dw@fiestatoursperu.com,dw1@fiestatoursperu.com';
 $referencia     = $input['referencia'] ?? '';
 
 if (empty($nombreContacto) || empty($emailContacto)) {
@@ -205,7 +205,9 @@ try {
         </table>
 
         " . buildSections($datosAEnviar, true) . "
-
+    <div style='text-align: center; margin-top: 30px; font-family: Arial, sans-serif; font-size: 15px; font-weight: bold; color: #2a4e33;'>
+                Calificaci&oacute;n general: {$datosAEnviar['calificacion']}
+            </div>
         <div class='footer'>Fiesta Tours Perú &copy; {$anioActual} - Todos los derechos reservados.</div>
     </body>
     </html>";
@@ -269,6 +271,13 @@ try {
 
         </td></tr>
 
+        <tr><td style='padding: 16px 24px; text-align: center; font-family: Arial, sans-serif; font-size: 15px; font-weight: bold; color: #2a4e33;'>
+                Calificaci&oacute;n general: {$datosAEnviar['calificacion']}
+            </td>
+        </tr>
+
+
+        
         <tr><td class=\"footer-row\">
             Fiesta Tours Per&uacute; &copy; {$anioActual} &mdash; Todos los derechos reservados.
         </td></tr>
